@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A little surprise for you</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#fdf1f6; --bg2:#e9d9f6; --ink:#6d1d33; --soft:#c98896; --rose:#b3283f; --card:#fff6f4; --paper:#f6ecd3;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#2b1219;--bg2:#3d1a25;--ink:#ffd9df;--soft:#b8697b;--rose:#ff7a93;--card:#3a1b25;--paper:#4a3a2f}
+}
+:root[data-theme="dark"]{--bg:#2b1219;--bg2:#3d1a25;--ink:#ffd9df;--soft:#b8697b;--rose:#ff7a93;--card:#3a1b25;--paper:#4a3a2f}
+*,*:before,*:after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:linear-gradient(160deg,var(--bg),var(--bg2));color:var(--ink);font-family:'Fredoka',system-ui,sans-serif;overflow:hidden}
+#floaters{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+#floaters span{position:absolute;bottom:-40px;opacity:.5;animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+.page{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;text-align:center;overflow-y:auto}
+.page>:first-child{margin-top:auto}.page>:last-child{margin-bottom:auto}
+.page.on{display:flex}
+h1,h2{font-family:'Caveat',cursive;color:var(--rose);font-weight:700}
+h1{font-size:clamp(36px,11vw,50px);margin:8px 0;line-height:1}
+h2{font-size:28px;margin:6px 0}
+p{margin:6px 0}
+.cat{font-size:92px;line-height:1;transition:transform .25s}
+.cat.pop{transform:scale(1.15) rotate(-6deg)}
+.pct{font-size:34px;font-weight:600;color:var(--rose);margin:4px 0 0}
+button,.btn{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--soft);border-radius:999px;padding:10px 26px;cursor:pointer;font-size:17px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--rose);outline-offset:3px}
+button:active{transform:scale(.97)}
+.next{margin-top:14px}
+.hide{visibility:hidden}
+/* gauge */
+.heart{width:min(250px,64vw);margin:4px auto 0;overflow:visible;filter:drop-shadow(0 6px 14px rgba(179,40,63,.25))}
+#liquid{transition:transform .2s ease-out}
+.wave{animation:wv 2.2s linear infinite}
+@keyframes wv{from{transform:translateX(-200px)}to{transform:translateX(0)}}
+.burst{position:fixed;pointer-events:none;font-size:26px;animation:fly 1.6s ease-out forwards;z-index:5}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy)) scale(1.4);opacity:0}}
+.beat{animation:beat .5s ease-in-out 3}
+.shake{animation:shk .5s}
+@keyframes shk{20%{transform:translateX(-10px) rotate(-4deg)}40%{transform:translateX(10px) rotate(4deg)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+@keyframes beat{50%{transform:scale(1.12)}}
+input[type=range]{-webkit-appearance:none;appearance:none;width:min(300px,80vw);height:8px;border-radius:8px;background:var(--soft);margin:14px 0 8px;touch-action:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--rose);border:4px solid var(--card)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--rose);border:4px solid var(--card)}
+/* gifts */
+.gifts{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap;justify-content:center}
+.gift{width:92px;height:92px;font-size:58px;display:grid;place-items:center;border-radius:20px;padding:0;position:relative}
+.gift small{position:absolute;bottom:-26px;font-size:14px;color:var(--ink);white-space:nowrap}
+.gift.done{opacity:.55}
+.gift:not(.done){animation:wiggle 2.4s ease-in-out infinite}
+.gift:nth-child(2){animation-delay:.3s}.gift:nth-child(3){animation-delay:.6s}
+@keyframes wiggle{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-7deg)}95%{transform:rotate(7deg)}}
+/* bouquet */
+.bouquet{font-size:84px;margin:6px 0}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(360px,100%);margin-top:6px}
+.note{background:var(--card);border:2px solid var(--soft);border-radius:18px 18px 18px 4px;padding:10px 12px;font-family:'Caveat',cursive;font-size:21px;line-height:1.1}
+.note:nth-child(even){border-radius:18px 18px 4px 18px}
+/* memory */
+.polaroid{background:#fffdf9;color:#6d1d33;padding:12px 12px 16px;width:min(300px,84vw);transform:rotate(-2deg);box-shadow:0 8px 24px rgba(109,29,51,.25)}
+.photo{aspect-ratio:4/3;height:auto;border-radius:2px;background:linear-gradient(#cfe4f5 55%,#9ec27f 55%);display:grid;place-items:center;cursor:pointer;overflow:hidden;position:relative;font-size:15px}
+.photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.cap{font-family:'Caveat',cursive;font-size:26px;margin-top:8px}
+.player{margin-top:18px;background:var(--card);border:2px solid var(--soft);border-radius:20px;padding:10px 16px;display:flex;align-items:center;gap:12px;width:min(320px,86vw);text-align:left}
+.player b{display:block;font-size:15px}.player span{font-size:13px;color:var(--soft)}
+.disc{width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,var(--card) 0 10%,var(--rose) 11% 100%);display:grid;place-items:center;font-size:22px;flex:none;animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.links{display:flex;gap:8px;margin-top:6px}
+.links a{color:var(--ink);background:var(--bg2);border-radius:999px;padding:4px 12px;font-size:14px;text-decoration:none}
+/* letter */
+.letter{background:var(--paper);color:#5b2a1c;width:min(380px,100%);padding:22px 22px 14px;border-radius:4px;box-shadow:0 8px 24px rgba(109,29,51,.2);text-align:left;font-family:'Caveat',cursive;font-size:23px;line-height:1.3;background-image:repeating-linear-gradient(transparent 0 29px,rgba(160,110,80,.25) 29px 30px)}
+.letter p{margin:0 0 12px}
+.sign{text-align:right;color:#b3283f}
+.intro .cat{font-size:80px}
+.sub{color:var(--soft);font-size:17px}
+
+.frame{position:fixed;inset:0;pointer-events:none;border:14px solid transparent;border-image:repeating-linear-gradient(135deg,#e58fb0 0 12px,#fff 12px 24px) 14;z-index:3}
+.polaroid.tilt{transform:rotate(4deg);margin:14px 0 20px}
+.pbtn{background:linear-gradient(#c8527d,#a93a63);color:#fff;border:3px solid #fff;box-shadow:0 5px 0 #8f2f52;padding:12px 34px;font-size:19px}
+.row{display:flex;gap:14px}
+.big{font-size:130px;line-height:1;display:grid;place-items:center;height:210px;background:#f1b556}
+/* balloons */
+.balloons{display:flex;gap:18px;margin:22px 0 10px;align-items:flex-start;justify-content:center;min-height:250px}
+.balloon{position:relative;width:78px;height:100px;border-radius:50% 50% 48% 48%/58% 58% 42% 42%;border:none;padding:0;cursor:pointer;display:grid;place-items:center;color:#fff;font-size:30px;box-shadow:inset -8px -10px 18px rgba(0,0,0,.12),0 8px 18px rgba(180,60,100,.25);animation:bob 3s ease-in-out infinite}
+.balloon:nth-child(1){background:radial-gradient(circle at 35% 30%,#f6a9c2,#d9648c)}
+.balloon:nth-child(2){background:radial-gradient(circle at 35% 30%,#f9dc9a,#e8b25e);animation-delay:.5s;margin-top:34px}
+.balloon:nth-child(3){background:radial-gradient(circle at 35% 30%,#d9c9f5,#a58ae0);animation-delay:1s;margin-top:12px}
+.balloon:after{content:"";position:absolute;left:50%;top:100%;width:2px;height:120px;background:linear-gradient(rgba(150,90,120,.5),transparent)}
+.balloon.popped{animation:popb .35s ease-out forwards;pointer-events:none}
+@keyframes bob{50%{transform:translateY(-12px) rotate(2deg)}}
+@keyframes popb{40%{transform:scale(1.35)}100%{transform:scale(1.9);opacity:0}}
+.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:44px}
+.chip{padding:8px 16px;font-size:16px}
+.prog{color:var(--soft);margin:10px 0 4px}
+.bar{width:min(300px,80vw);height:12px;border-radius:12px;background:var(--card);border:2px solid var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#e58fb0,#e8c27a,#8fc58a);transition:width .4s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:420px){.balloons{gap:12px}.balloon{width:64px;height:84px;font-size:24px}}
+.balloon:nth-child(4){background:radial-gradient(circle at 35% 30%,#bfe8d8,#6fc3a4);animation-delay:1.5s;margin-top:22px}
+.vplay{width:78px;height:78px;border-radius:50%;font-size:30px;padding:0;margin:8px 0 12px;background:linear-gradient(#c8527d,#a93a63);color:#fff;border:3px solid #fff;box-shadow:0 5px 0 #8f2f52}
+.vplay.playing .disc2{animation:spin 4s linear infinite}
+.vbar{width:min(300px,80vw);height:8px;border-radius:8px;background:var(--card);border:2px solid var(--soft);overflow:hidden;margin-bottom:14px}
+.vbar i{display:block;height:100%;width:0;background:var(--rose)}
+#vText{min-height:150px;white-space:pre-wrap}
+.cursor{display:inline-block;width:2px;height:1em;background:#b3283f;vertical-align:-2px;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.fun{font-family:'Caveat',cursive;font-size:23px;color:var(--rose);margin:14px 6px 0;max-width:330px;line-height:1.15}
+.clist{display:grid;gap:10px;width:min(340px,100%);margin-top:10px}
+.coupon{text-align:left;border:2px dashed var(--soft);border-radius:14px;padding:10px 14px;font-size:16px;line-height:1.25;width:100%}
+.coupon small{display:block;color:var(--soft);font-size:13px;margin-top:2px}
+.coupon.used{opacity:.6}
+.dare{width:min(320px,86vw);min-height:150px;margin:16px 0 18px;padding:20px;display:grid;place-items:center;background:var(--card);border:3px dashed var(--soft);border-radius:22px;font-family:'Caveat',cursive;font-size:28px;line-height:1.15;color:var(--rose)}
+</style>
+</head>
+<body>
+<div class="frame" aria-hidden="true"></div>
+<div id="floaters" aria-hidden="true"></div>
+
+<!-- 1: love test -->
+<section class="page on" id="p-test">
+  <div class="cat" id="cat">😺</div>
+  <h2 id="msg"></h2>
+  <div class="pct" id="pct">0%</div>
+  <svg class="heart" viewBox="0 0 200 180" aria-hidden="true">
+    <defs><clipPath id="hc"><path d="M100 172 C18 112 4 72 4 48 C4 22 26 6 52 6 C74 6 90 18 100 36 C110 18 126 6 148 6 C174 6 196 22 196 48 C196 72 182 112 100 172 Z"/></clipPath></defs>
+    <path d="M100 172 C18 112 4 72 4 48 C4 22 26 6 52 6 C74 6 90 18 100 36 C110 18 126 6 148 6 C174 6 196 22 196 48 C196 72 182 112 100 172 Z" fill="var(--card)"/>
+    <g clip-path="url(#hc)"><g id="liquid" style="transform:translateY(180px)"><g class="wave"><path d="M0 0 Q25 -9 50 0 T100 0 T150 0 T200 0 T250 0 T300 0 T350 0 T400 0 V200 H0 Z" fill="#d8606f"/><path d="M0 6 Q25 -3 50 6 T100 6 T150 6 T200 6 T250 6 T300 6 T350 6 T400 6 V200 H0 Z" fill="#b3283f" opacity=".85"/></g></g></g>
+    <path d="M100 172 C18 112 4 72 4 48 C4 22 26 6 52 6 C74 6 90 18 100 36 C110 18 126 6 148 6 C174 6 196 22 196 48 C196 72 182 112 100 172 Z" fill="none" stroke="#6d1d33" stroke-width="4"/>
+    <text x="100" y="92" text-anchor="middle" font-family="Caveat" font-size="44" font-weight="700" fill="#fff" stroke="#6d1d33" stroke-width="1" paint-order="stroke" id="hText">love</text>
+  </svg>
+  <p class="sub" id="hint">Slide to fill my heart</p>
+  <input type="range" id="slider" min="0" max="100" value="0" aria-label="How much do you love me">
+  <button class="next hide" id="toGifts">Next →</button>
+</section>
+
+<!-- 2: excited -->
+<section class="page" id="p-excited">
+  <h1>Are you really excited?</h1>
+  <div class="polaroid tilt"><div class="big">😜</div><div class="cap">tell the truth, <span class="nm"></span> 👀</div></div>
+  <div class="row"><button class="pbtn go-balloons">Yes</button><button class="pbtn go-balloons">Yes 😍</button></div>
+</section>
+
+<!-- 2b: balloons -->
+<section class="page" id="p-gifts">
+  <h1>Each balloon has a surprise</h1>
+  <p class="sub">Pop them one by one, <span class="nm"></span> 🎈</p>
+  <div class="balloons">
+    <button class="balloon" data-go="p-memory" data-name="📸 Memory" aria-label="Pop balloon 1">❤</button>
+    <button class="balloon" data-go="p-voice" data-name="🎙️ Voice" aria-label="Pop balloon 2">❤</button>
+    <button class="balloon" data-go="p-coupons" data-name="🎟️ Coupons" aria-label="Pop balloon 3">❤</button>
+    <button class="balloon" data-go="p-dare" data-name="😈 Dare" aria-label="Pop balloon 4">❤</button>
+  </div>
+  <p class="prog" id="prog">0 / 4 popped</p>
+  <div class="bar"><i id="barf"></i></div>
+  <div class="chips" id="chips" style="margin-top:14px"></div>
+</section>
+
+<!-- 3: bouquet -->
+<section class="page" id="p-bouquet">
+  <h1>Your Bouquet</h1>
+  <div class="bouquet">💐</div>
+  <div class="notes">
+    <div class="note">You make my heart bloom.</div>
+    <div class="note">I choose you every day.</div>
+    <div class="note">Life feels sweeter with you.</div>
+    <div class="note">My love for you keeps growing.</div>
+    <div class="note">You make every moment sweeter.</div>
+    <div class="note">My heart will always choose you.</div>
+  </div>
+  <button class="next back">Back to balloons →</button>
+</section>
+
+<!-- 4: memory -->
+<section class="page" id="p-memory">
+  <div class="polaroid">
+    <div class="photo"><img id="photoImg" alt="Us together"></div>
+    <div class="cap">our favourite memory 💗</div>
+  </div>
+  <p class="fun" id="funPhoto"></p>
+  <div class="player">
+    <div class="disc">🎵</div>
+    <div><b id="songTitle"></b><span>our song 🎶</span>
+      <div class="links"><a id="lnkYT" href="#" target="_blank" rel="noopener">▶ YouTube</a><a id="lnkSP" href="#" target="_blank" rel="noopener">Spotify</a></div></div>
+  </div>
+  <button class="next back">Back to balloons →</button>
+</section>
+
+<!-- 5: letter -->
+<section class="page" id="p-letter">
+  <h2>A Letter From My Heart</h2>
+  <div class="letter">
+    <p>You make my life feel more beautiful and meaningful, and I feel so lucky to have you. I love you wholeheartedly, and I can't wait to continue loving you for the rest of my life.</p>
+    <p>You make me smile, you make me feel safe, and you bring so much happiness into my world.</p>
+    <p>Thank you for being you and for filling my heart with so much love. No matter what happens, I will always choose you.</p>
+    <p class="sign">Always, forever. 💗</p>
+  </div>
+  <button class="next back">Back to balloons →</button>
+</section>
+
+<!-- coupons -->
+<section class="page" id="p-coupons">
+  <h2>Naughty Coupons 🎟️</h2>
+  <p class="sub"><span class="nm"></span>, ye sab sirf tumhare liye 😏</p>
+  <div class="clist" id="coupons"></div>
+  <button class="next back">Back to balloons →</button>
+</section>
+
+<!-- dare -->
+<section class="page" id="p-dare">
+  <h2>Truth or Dare 😈</h2>
+  <div class="dare" id="dareCard">Tap karo aur apna dare lo 🎲</div>
+  <button class="pbtn" id="dareBtn">Next dare 🎲</button>
+  <button class="next back">Back to balloons →</button>
+</section>
+
+<!-- 6: voice letter -->
+<section class="page" id="p-voice">
+  <h2>A Voice Note For You, <span class="nm"></span></h2>
+  <p class="fun">Headphones laga lo <span class="nm"></span>… thoda naughty hai 😏</p>
+  <button class="vplay" id="vplay" aria-label="Play or pause"><span class="disc2" style="display:inline-block">▶</span></button>
+  <div class="vbar"><i id="vbar"></i></div>
+  <div class="letter"><p id="vText"></p><span class="cursor" id="vcur"></span></div>
+  <button class="next back">Back to balloons →</button>
+</section>
+<audio id="voice" preload="auto" playsinline></audio>
+
+<script>
+// ============ CONFIG: yahan apne links / naam / text badlo ============
+const CONFIG={
+  NAME:'Shivani baby',
+  PHOTO:'https://drive.google.com/file/d/1DyCQJSfqdoSG7J62dvEDUgyXKqdiSVYa/view?usp=drivesdk',                 // photo ki file ya link (same folder me rakho)
+  AUDIO:'https://drive.google.com/file/d/1uhHDDvGJId_ET25RyjahF7PjkT2kLADt/view?usp=drivesdk',                 // audio ki file ya link
+  SONG_TITLE:'Tere Bin Mera Maan',
+  SONG_YOUTUBE:'https://www.youtube.com/shorts/Wa-NMmud_yk',
+  SONG_SPOTIFY:'https://open.spotify.com/track/0s8fGVzyn6URNrUVwCE3dV?si=YsgTa9yVRlq2c3uddQBG-w&utm_source=copy-link',
+  PHOTO_LINE:'Itni cute lag rahi ho ki camera bhi sharma gaya 😏',
+  VOICE_TEXT:'"Haan to baby doll, main tumse ye kehna chahta hoon ki yaar hum jitna bhi mile, humne jitni bhi baatein kari—chahe first date ho, second date ho, third date ho, uske baad bhi hum mile—to har baar mere ko bohot kaafi achha feel hua tumhare saath reh ke, time spend karke. Aur tum meri bohot care bhi karti ho cheezon ko lekar, samajhti ho cheezon ko, problem ko. Bohot saari cheezein hain jiske wajah se main tumhare saath bohot comfortable feel karta hoon. Mere ko bohot loved feel hota hai tumhare saath rehte hue. Tum meri chhoti-chhoti cheezon ko appreciate karti ho. Like tumhara emotion dikhana, jaise hum ghoomte hain, kuch bhi hath pakadna, aise ekdum pyaar se rehna... Bohot saare na chhote-chhote moments hain mere ko bohot pyaare lagte hain tumhare saath. Aur main... mere ko tum bohot pyaari lagti ho, bohot zyada achhi lagti ho. Will you be my girlfriend? Batao baby doll?" 💌'   // audio me jo bola hai wahi likho
+};
+// ======================================================================
+const N=CONFIG.NAME;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let current='p-test', last='p-gifts';
+function show(id){ $$('.page').forEach(p=>p.classList.toggle('on',p.id===id)); current=id; }
+
+// floating hearts
+const fl=$('#floaters');
+for(let i=0;i<14;i++){const s=document.createElement('span');s.textContent=['💗','🌸','💕','✨'][i%4];
+  s.style.left=Math.random()*100+'%';s.style.fontSize=(14+Math.random()*18)+'px';
+  s.style.animationDuration=(9+Math.random()*10)+'s';s.style.animationDelay=(-Math.random()*14)+'s';fl.appendChild(s);}
+
+// love meter: liquid heart
+const mood=v=> v>=100?['😻','Correct answer '+N+'! 😘']
+  : v>=85?['😽','Almost there '+N+'… bas thoda aur 😏']
+  : v>=60?['😾',N+', half? Seriously? 😒']
+  : v>=30?['😿',N+', ye to bohot kam hai… 😿']
+  : v>=1?['🙀','Itna sa, '+N+'? Meri billi ro degi 🙀']
+  : ['😺',N+', how much do you love me?'];
+const slider=$('#slider'),cat=$('#cat');
+let reached=false;
+function burst(){
+  const r=$('.heart').getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  for(let i=0;i<22;i++){const e=document.createElement('span');e.className='burst';e.textContent=['💗','💖','💕','✨','🌸'][i%5];
+    e.style.left=cx+'px';e.style.top=cy+'px';
+    const ang=Math.random()*Math.PI*2,d=90+Math.random()*150;
+    e.style.setProperty('--dx',Math.cos(ang)*d+'px');e.style.setProperty('--dy',Math.sin(ang)*d+'px');
+    document.body.appendChild(e);setTimeout(()=>e.remove(),1700);}
+  try{navigator.vibrate&&navigator.vibrate([60,40,60]);}catch(e){}
+}
+// Game: pehli 3 baar 100% pe pahunchne par meter 10% pe gir jaata hai
+const teases=[
+  ['🥺','Bas itna hi pyar karti ho kya '+N+'? 🥺'],
+  ['💔','Itna sa?! Mera dil toot gaya '+N+' 💔 Ek baar aur try karo na'],
+  ['😿','Pakka itna hi '+N+'? Dekho billi ro padi 😿 Dil se karo ab!']
+];
+let tries=0,busy=false;
+function setMeter(v){
+  $('#liquid').style.transform='translateY('+(180-v*1.72)+'px)';
+    if(!reached&&!busy)$('#pct').textContent=Math.round(v)+'%';
+}
+function setCat(e){if(cat.textContent!==e){cat.textContent=e;cat.classList.add('pop');setTimeout(()=>cat.classList.remove('pop'),250);}}
+function tease(){
+  busy=true;slider.disabled=true;
+  const [e,t]=teases[tries++];
+  setCat(e);$('#msg').textContent=t;$('#pct').textContent='100%';
+  $('.heart').classList.remove('shake');void $('.heart').offsetWidth;$('.heart').classList.add('shake');
+  try{navigator.vibrate&&navigator.vibrate(120);}catch(_){}
+  setTimeout(()=>{
+    let v=100;
+    const id=setInterval(()=>{
+      v-=3;
+      if(v<=10){v=10;clearInterval(id);slider.value=10;setMeter(10);busy=false;slider.disabled=false;
+        $('#pct').textContent='10%';$('#hint').textContent='Ek baar phir se try karo '+N+' 💪';$('#hint').style.visibility='visible';}
+      else{slider.value=v;setMeter(v);$('#pct').textContent=Math.round(v)+'%';}
+    },25);
+  },1300);
+}
+slider.addEventListener('input',()=>{
+  if(busy)return;
+  const v=+slider.value,[e,t]=mood(v);
+  if(!reached){$('#pct').textContent=v+'%';if(!(v<100&&tries>0&&v<=10))$('#msg').textContent=t;}
+  $('#hint').style.visibility=v>0?'hidden':'visible';
+  setMeter(v);setCat(e);
+  if(v>=100){
+    if(tries<teases.length){tease();return;}
+    if(!reached){
+      reached=true;burst();$('.heart').classList.add('beat');$('#toGifts').classList.remove('hide');
+      $('#msg').textContent='Okayyy '+N+', ab sahi hai! Correct answer 😻';
+      setTimeout(()=>{$('#pct').textContent='∞';$('#msg').textContent='Meter toot gaya '+N+'! Itna pyar? 😘';burst();},1600);
+    }
+  }
+});
+$('#toGifts').onclick=()=>show('p-excited');
+$$('.go-balloons').forEach(b=>b.onclick=()=>show('p-gifts'));
+
+// balloons
+let ac;
+function popSound(){
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    const n=ac.sampleRate*.12,buf=ac.createBuffer(1,n,ac.sampleRate),d=buf.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+    const src=ac.createBufferSource(),g=ac.createGain();g.gain.value=.5;src.buffer=buf;src.connect(g).connect(ac.destination);src.start();}catch(e){}
+}
+function burstAt(x,y,set){
+  for(let i=0;i<18;i++){const e=document.createElement('span');e.className='burst';e.textContent=set[i%set.length];
+    e.style.left=x+'px';e.style.top=y+'px';
+    const ang=Math.random()*Math.PI*2,d=70+Math.random()*120;
+    e.style.setProperty('--dx',Math.cos(ang)*d+'px');e.style.setProperty('--dy',Math.sin(ang)*d+'px');
+    document.body.appendChild(e);setTimeout(()=>e.remove(),1700);}
+}
+let popped=0;
+function progress(){
+  $('#prog').textContent=popped<4?popped+' / 4 popped':'Saare balloons phod diye '+N+'! 🎉 Ab sab tumhara';
+  $('#barf').style.width=(popped/4*100)+'%';
+}
+$$('.balloon').forEach(bl=>bl.onclick=()=>{
+  const r=bl.getBoundingClientRect();
+  bl.classList.add('popped');popSound();
+  burstAt(r.left+r.width/2,r.top+r.height/2,['💗','✨','🎈','💖']);
+  try{navigator.vibrate&&navigator.vibrate(40);}catch(e){}
+  popped++;progress();
+  const go=bl.dataset.go,name=bl.dataset.name;
+  if(go==='p-voice')startVoice();
+  const chip=document.createElement('button');chip.className='chip';chip.textContent=name;chip.onclick=()=>{show(go);if(go==='p-voice')startVoice();};
+  $('#chips').appendChild(chip);
+  setTimeout(()=>show(go),600);
+});
+$$('.back').forEach(b=>b.onclick=()=>{voice.pause();show('p-gifts');});
+
+
+
+// voice note: audio plays, text is written letter-style in sync
+// EDIT THIS TEXT: jo audio me bola hai wahi yahan likho
+const VOICE_TEXT=CONFIG.VOICE_TEXT;
+const voice=$('#voice'),vplay=$('#vplay'),vText=$('#vText');
+function paintVoice(){
+  const d=voice.duration&&isFinite(voice.duration)?voice.duration:51.5;
+  const f=voice.ended?1:Math.min(1,voice.currentTime/d);
+  vText.textContent=VOICE_TEXT.slice(0,Math.ceil(VOICE_TEXT.length*f));
+  $('#vbar').style.width=(f*100)+'%';
+}
+function startVoice(){voice.currentTime=0;voice.play().catch(()=>{});}
+vplay.onclick=()=>voice.paused?voice.play().catch(()=>{}):voice.pause();
+voice.addEventListener('play',()=>{vplay.classList.add('playing');vplay.firstChild.textContent='❚❚';});
+['pause','ended'].forEach(e=>voice.addEventListener(e,()=>{vplay.classList.remove('playing');vplay.firstChild.textContent='▶';}));
+voice.addEventListener('timeupdate',paintVoice);voice.addEventListener('ended',paintVoice);
+
+// ---------- init: config se sab set karo ----------
+$$('.nm').forEach(e=>e.textContent=N);
+$('#msg').textContent=mood(0)[1];
+$('#hText').textContent=N.split(' ')[0];
+$('#photoImg').src=CONFIG.PHOTO;
+voice.src=CONFIG.AUDIO;
+$('#songTitle').textContent=CONFIG.SONG_TITLE;
+$('#lnkYT').href=CONFIG.SONG_YOUTUBE;$('#lnkSP').href=CONFIG.SONG_SPOTIFY;
+$('#funPhoto').textContent=N+', '+CONFIG.PHOTO_LINE;
+
+// naughty coupons
+[
+ '🤗 1 jaadu ki jhappi — jitni der chaho',
+ '😘 1 kiss, expiry: kabhi nahi',
+ '🧸 10 min naughty cuddle, no phones, no questions 😏',
+ '🍟 Meri fries chori karne ka license',
+ '👕 Mera hoodie “borrow” karne ka permanent pass',
+ '😈 1 naughty wish — T&C apply 😜'
+].forEach(t=>{
+  const d=document.createElement('button');d.className='coupon';
+  d.append(t);const s=document.createElement('small');s.textContent='tap to redeem';d.appendChild(s);
+  d.onclick=()=>{d.classList.add('used');s.textContent='✅ Redeemed — screenshot bhej dena 😘';
+    const r=d.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['😘','💗','😏']);};
+  $('#coupons').appendChild(d);
+});
+
+// truth or dare
+const DARES=[
+ 'Dare: abhi mujhe ek flying kiss bhejo 😘',
+ 'Truth: mujhe dekh ke sabse naughty thought kya aaya tha? 😏',
+ 'Dare: 10 second meri aankhon me dekho, bina hase 👀',
+ 'Dare: mujhe aisa message bhejo jo main screenshot karke rakhun 🙈',
+ 'Truth: meri kaunsi aadat sabse cute lagti hai, aur kaunsi irritating? 😜',
+ 'Dare: abhi call karo aur sirf “I love you” bolo 📞',
+ 'Truth: agar main abhi saamne hota to sabse pehle kya karti? 😏'
+];
+let di=-1;
+$('#dareBtn').onclick=()=>{
+  let n;do{n=Math.floor(Math.random()*DARES.length);}while(n===di);di=n;
+  $('#dareCard').textContent=N+', '+DARES[n];
+  const r=$('#dareBtn').getBoundingClientRect();burstAt(r.left+r.width/2,r.top,['😈','😏','🔥']);
+};
+</script>
+</body>
+</html>
